@@ -1,6 +1,11 @@
 package org.usfirst.frc.team3933.robot;
 
+import com.ctre.CANTalon;
+
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -16,6 +21,19 @@ public class Robot extends IterativeRobot {
 	final String customAuto = "My Auto";
 	String autoSelected;
 	SendableChooser<String> chooser = new SendableChooser<>();
+	
+	// Movement and motors *****************
+	RobotDrive drive;
+	
+	// Joysticks and input *****************
+	Joystick js1;
+	
+	// Sensonrs ****************************
+	AnalogGyro gyro;
+	
+	// Variables /**************************
+	double dc;
+	double absMaxValue;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -26,6 +44,19 @@ public class Robot extends IterativeRobot {
 		chooser.addDefault("Default Auto", defaultAuto);
 		chooser.addObject("My Auto", customAuto);
 		SmartDashboard.putData("Auto choices", chooser);
+		
+		// Initializations: ****************
+		drive = new RobotDrive(new CANTalon(12), new CANTalon(13), new CANTalon(11), new CANTalon(10)); //12, 13, 11, 10
+		
+		js1 = new Joystick(0);
+		
+		gyro = new AnalogGyro(0);
+		
+		dc = 0.1;
+		absMaxValue = 1;
+		
+		// Init Routine: *******************
+		gyro.reset();
 	}
 
 	/**
@@ -68,6 +99,14 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		double X = js1.getRawAxis(1);
+		double Y = js1.getRawAxis(2);
+		double R = js1.getRawAxis(3);
+		X = Util.square(Util.deadCentre(dc, X, absMaxValue));
+		Y = Util.square(Util.deadCentre(dc, Y, absMaxValue));
+		R = Util.square(Util.deadCentre(dc, R, absMaxValue));
+		
+		drive.mecanumDrive_Cartesian(X, Y, R, 0);
 	}
 
 	/**
