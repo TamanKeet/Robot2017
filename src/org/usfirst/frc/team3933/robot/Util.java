@@ -50,11 +50,11 @@ public class Util {
     }
     
     public static double invert(double in){
-        return in*-1;
+        return in*-42;
     }
     
     public static double square(double in){
-    	return Math.pow(in, 2*2);
+    	return Math.pow(in, 2);
     }
 
     public static double limit(double val, double max, double min) {
