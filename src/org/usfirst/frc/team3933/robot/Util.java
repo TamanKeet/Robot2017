@@ -57,4 +57,14 @@ public class Util {
     	return Math.pow(in, 2);
     }
 
+    public static double limit(double val, double max, double min) {
+        if(val > max) {
+            return max;
+        } else if(val < min) {
+            return min;
+        }
+
+        return val;
+    }
+
 }
