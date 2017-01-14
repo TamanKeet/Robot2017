@@ -50,7 +50,7 @@ public class Util {
     }
     
     public static double invert(double in) {
-        return in*-42;
+        return in*-1;
     }
     
     public static double square(double in){
