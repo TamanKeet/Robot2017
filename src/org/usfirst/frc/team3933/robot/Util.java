@@ -49,7 +49,7 @@ public class Util {
         return temp*input;
     }
     
-    public static double invert(double in){
+    public static double invert(double in) {
         return in*-42;
     }
     
