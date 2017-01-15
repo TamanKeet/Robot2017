@@ -1,13 +1,13 @@
 package org.usfirst.frc.team3933.robot;
 
-import com.ctre.CANTalon;
-
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
+import com.ctre.CANTalon;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -34,6 +34,10 @@ public class Robot extends IterativeRobot {
 	// Variables /**************************
 	double dc;
 	double absMaxValue;
+	
+	//Motores
+	private CANTalon rodillo;
+	private CANTalon disparador;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -45,8 +49,11 @@ public class Robot extends IterativeRobot {
 		chooser.addObject("My Auto", customAuto);
 		SmartDashboard.putData("Auto choices", chooser);
 		
-		// Initializations: ****************
+		// Initializations: ***************
 		drive = new RobotDrive(new CANTalon(12), new CANTalon(13), new CANTalon(11), new CANTalon(10)); //12, 13, 11, 10
+		
+		rodillo = new CANTalon(14);
+		disparador = new CANTalon(15);
 		
 		js1 = new Joystick(0);
 		
@@ -99,14 +106,34 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		double X = js1.getRawAxis(1);
-		double Y = js1.getRawAxis(2);
-		double R = js1.getRawAxis(3);
+		//Chasis
+		double X = js1.getRawAxis(0);
+		double Y = js1.getRawAxis(1);
+		double R = js1.getRawAxis(4);
 		X = Util.square(Util.deadCentre(dc, X, absMaxValue));
 		Y = Util.square(Util.deadCentre(dc, Y, absMaxValue));
 		R = Util.square(Util.deadCentre(dc, R, absMaxValue));
 		
 		drive.mecanumDrive_Cartesian(X, Y, R, 0);
+		
+		//Rodillo Con Trigger
+		double botonRT2 = js1.getRawAxis(3);
+        double botonLT2 = js1.getRawAxis(2);
+           
+        double out2 = botonLT2-botonRT2*0.600;
+          
+        rodillo.set(out2);
+        
+        //Disparador
+        boolean botonA = js1.getRawButton(1);
+		boolean botonB = js1.getRawButton(2);
+		
+		if (botonA){
+			disparador.set(1);
+		}
+		else if (botonB){
+			disparador.set(0);
+		}
 	}
 
 	/**
@@ -116,4 +143,3 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 	}
 }
-
