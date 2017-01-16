@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.RobotDrive.MotorType;
+
 import com.ctre.CANTalon;
 
 
@@ -17,8 +19,10 @@ import com.ctre.CANTalon;
  * directory.
  */
 public class Robot extends IterativeRobot {
+	
 	final String defaultAuto = "Default";
 	final String customAuto = "My Auto";
+	
 	String autoSelected;
 	SendableChooser<String> chooser = new SendableChooser<>();
 	
@@ -51,6 +55,8 @@ public class Robot extends IterativeRobot {
 		
 		// Initializations: ***************
 		drive = new RobotDrive(new CANTalon(12), new CANTalon(13), new CANTalon(11), new CANTalon(10)); //12, 13, 11, 10
+		drive.setInvertedMotor(MotorType.kFrontRight, true);
+		drive.setInvertedMotor(MotorType.kRearRight, true);
 		
 		rodillo = new CANTalon(14);
 		disparador = new CANTalon(15);
@@ -106,34 +112,40 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
+		
 		//Chasis
 		double X = js1.getRawAxis(0);
 		double Y = js1.getRawAxis(1);
 		double R = js1.getRawAxis(4);
+		
 		X = Util.square(Util.deadCentre(dc, X, absMaxValue));
 		Y = Util.square(Util.deadCentre(dc, Y, absMaxValue));
 		R = Util.square(Util.deadCentre(dc, R, absMaxValue));
 		
 		drive.mecanumDrive_Cartesian(X, Y, R, 0);
 		
-		//Rodillo Con Trigger
-		double botonRT2 = js1.getRawAxis(3);
-        double botonLT2 = js1.getRawAxis(2);
-           
-        double out2 = botonLT2-botonRT2*0.600;
-          
-        rodillo.set(out2);
-        
-        //Disparador
-        boolean botonA = js1.getRawButton(1);
+		//Rodillo Con Boton
+		boolean botonA = js1.getRawButton(1);
 		boolean botonB = js1.getRawButton(2);
 		
 		if (botonA){
-			disparador.set(1);
+			rodillo.set(-1);
 		}
 		else if (botonB){
+			rodillo.set(0);
+		}
+        
+        //Disparador
+        boolean botonX = js1.getRawButton(3);
+		boolean botonY = js1.getRawButton(4);
+		
+		if (botonX){
+			disparador.set(1);
+		}
+		else if (botonY){
 			disparador.set(0);
 		}
+		
 	}
 
 	/**
@@ -143,3 +155,4 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 	}
 }
+
