@@ -40,8 +40,10 @@ public class Robot extends IterativeRobot {
 	double absMaxValue;
 	
 	//Motores
-	private CANTalon rodillo;
-	private CANTalon disparador;
+	CANTalon fl = new CANTalon(12);
+	CANTalon rl = new CANTalon(13);
+	CANTalon fr = new CANTalon(11);
+	CANTalon rr = new CANTalon(10);
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -54,12 +56,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putData("Auto choices", chooser);
 		
 		// Initializations: ***************
-		drive = new RobotDrive(new CANTalon(12), new CANTalon(13), new CANTalon(11), new CANTalon(10)); //12, 13, 11, 10
-		drive.setInvertedMotor(MotorType.kFrontRight, true);
-		drive.setInvertedMotor(MotorType.kRearRight, true);
-		
-		rodillo = new CANTalon(14);
-		disparador = new CANTalon(15);
+		drive = new RobotDrive(fl, rl, fr, ff);
 		
 		js1 = new Joystick(0);
 		
@@ -123,28 +120,6 @@ public class Robot extends IterativeRobot {
 		R = Util.square(Util.deadCentre(dc, R, absMaxValue));
 		
 		drive.mecanumDrive_Cartesian(X, Y, R, 0);
-		
-		//Rodillo Con Boton
-		boolean botonA = js1.getRawButton(1);
-		boolean botonB = js1.getRawButton(2);
-		
-		if (botonA){
-			rodillo.set(-1);
-		}
-		else if (botonB){
-			rodillo.set(0);
-		}
-        
-        //Disparador
-        boolean botonX = js1.getRawButton(3);
-		boolean botonY = js1.getRawButton(4);
-		
-		if (botonX){
-			disparador.set(1);
-		}
-		else if (botonY){
-			disparador.set(0);
-		}
 		
 	}
 

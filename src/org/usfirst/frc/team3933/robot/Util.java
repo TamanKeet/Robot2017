@@ -54,7 +54,8 @@ public class Util {
     }
     
     public static double square(double in){
-    	return Math.pow(in, 2);
+    	
+    	return Math.copySign(Math.pow(in, 2), in);
     }
 
     public static double limit(double val, double max, double min) {
@@ -63,7 +64,6 @@ public class Util {
         } else if(val < min) {
             return min;
         }
-
         return val;
     }
 
