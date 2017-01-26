@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.RobotDrive.MotorType;
 
@@ -34,16 +35,21 @@ public class Robot extends IterativeRobot {
 	
 	// Sensonrs ****************************
 	AnalogGyro gyro;
+	AnalogUltra ultra;
 	
 	// Variables /**************************
 	double dc;
 	double absMaxValue;
 	
 	//Motores
-	CANTalon fl = new CANTalon(12);
-	CANTalon rl = new CANTalon(13);
-	CANTalon fr = new CANTalon(11);
-	CANTalon rr = new CANTalon(10);
+	CANTalon fl = new CANTalon(10);
+	CANTalon rl = new CANTalon(11);
+	CANTalon fr = new CANTalon(13);
+	CANTalon rr = new CANTalon(12);
+	
+	
+	PIDController pid;
+	DummyPID out;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -56,17 +62,27 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putData("Auto choices", chooser);
 		
 		// Initializations: ***************
-		drive = new RobotDrive(fl, rl, fr, ff);
+		drive = new RobotDrive(fl, rl, fr, rr);
 		
-		js1 = new Joystick(0);
+		//js1 = new Joystick(0);
 		
-		gyro = new AnalogGyro(0);
+		//gyro = new AnalogGyro(0);
+		
+		ultra = new AnalogUltra(0, 0.009775);
 		
 		dc = 0.1;
 		absMaxValue = 1;
 		
 		// Init Routine: *******************
-		gyro.reset();
+		//gyro.reset();
+		
+		
+		double kp = 0.01;
+		double ki = 0.01;
+		double kd = 0.01;
+		
+		out = new DummyPID();
+		pid = new PIDController(kp,ki,kd, ultra, out);
 	}
 
 	/**
@@ -103,13 +119,18 @@ public class Robot extends IterativeRobot {
 			break;
 		}
 	}
-
+	
+	public void teleopInit(){
+		pid.enable();
+		System.out.println("PID Enabled!");
+	}
+	
 	/**
 	 * This function is called periodically during operator control
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
+		/*
 		//Chasis
 		double X = js1.getRawAxis(0);
 		double Y = js1.getRawAxis(1);
@@ -120,7 +141,32 @@ public class Robot extends IterativeRobot {
 		R = Util.square(Util.deadCentre(dc, R, absMaxValue));
 		
 		drive.mecanumDrive_Cartesian(X, Y, R, 0);
+		*/
 		
+		//SmartDashboard.putNumber("DB/String 0", ultra.getDistCm());
+		SmartDashboard.putString("DB/String 0", Double.toString(ultra.getDistCm()));
+		
+		
+		double kp = SmartDashboard.getNumber("DB/Slider 0", 0)/100.0;
+		double ki = SmartDashboard.getNumber("DB/Slider 1", 0)/100.0;
+		double kd = SmartDashboard.getNumber("DB/Slider 2", 0)/100.0;
+		
+		SmartDashboard.putString("DB/String 5", Double.toString(kp));
+		SmartDashboard.putString("DB/String 6", Double.toString(ki));
+		SmartDashboard.putString("DB/String 7", Double.toString(kd));
+		
+		pid.setPID(kp, ki, kd);
+		
+		pid.setSetpoint(150);
+		
+		//out.setNegate(true);
+		
+		SmartDashboard.putString("DB/String 1", Double.toString(out.readPid()));
+		if(SmartDashboard.getBoolean("DB/Button 1", true)){
+			drive.mecanumDrive_Cartesian(out.readPid(), 0, 0, 0);
+		}else{
+			drive.stopMotor();
+		}
 	}
 
 	/**
